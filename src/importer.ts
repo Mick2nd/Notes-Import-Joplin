@@ -27,7 +27,8 @@ export class Importer
         for (var book of archive_structure['notebooks'])                                             	// all note books
 		{
             const nb_name = book['nb_name'];
-            const nb_data = await this.joplin.put_folder(folder.id, nb_name);                      		// put it as folder
+			this.joplin.set_time(book.create_time, book.update_time);									// prepare the time
+			const nb_data = await this.joplin.put_folder(folder.id, nb_name);                      		// put it as folder
             const nb_id = nb_data['id'];
             // this.logger.info(nb_name)
             // this.refresh()                                                                      		// refreshes the GUI
@@ -35,6 +36,7 @@ export class Importer
             for (var section of book['sec_list'])                                                    	// all sections in note book
 			{
                 const sec_name = section['sec_name'];
+				this.joplin.set_time(section.create_time, section.update_time);							// prepare the time
                 const sec_data = await this.joplin.put_folder(nb_id, sec_name);                         // put it as folder
                 const sec_id = sec_data['id'];
                 // this.logger.info(f'- {sec_name}')
@@ -47,12 +49,14 @@ export class Importer
                     const note_name = note_file['note_name'];
                     const note_content = note_file['content'];
                     var md = await this.convert_note(location, note_content);                           // convert the content to mark down
+					this.joplin.set_time(note_file.create_time, note_file.update_time);					// prepare the time
                     const resp = await this.joplin.put_note(sec_id, note_name, md);                     // put the note
                     // this.logger.info(f'-- {note_name}')
                     // this.refresh()                                                              		// refreshes the GUI
         
                     for (var tag of note_file['tag_list'])
 					{
+						this.joplin.set_time(tag.create_time, tag.create_time);							// prepare the time
                         await this.joplin.put_tag(resp['id'], tag['tag_name'])
                         // this.logger.info(f'--- tag: {tag["tag_name"]}')
                         // this.refresh()                                                              	// refreshes the GUI
@@ -188,10 +192,13 @@ export class Importer
                     md += '<br/>';
 			}
 			
-			const indent = para.attrs.indent || 0;
-			if (indent > 0)
+			if (para.attrs)
 			{
-				return `<p style="padding-left: ${indent}em;">${md}</p>`;
+				const indent = para.attrs.indent || 0;
+				if (indent > 0)
+				{
+					return `<p style="padding-left: ${indent}em;">${md}</p>`;
+				}
 			}
             
             return md;

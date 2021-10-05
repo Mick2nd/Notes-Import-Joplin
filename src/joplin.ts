@@ -22,6 +22,16 @@ export class Joplin
 		this.decoder = new StringDecoder('utf-8');
 		this.encoder = new TextEncoder();
 	}
+	
+	
+	/**
+		@abstract Sets the time values for the next post action
+	 */
+	public set_time = function(created: string, updated: string) : void
+	{
+		this.created = (new Date(created)).valueOf();
+		this.updated = (new Date(updated)).valueOf();
+	}
 
 
 	/**
@@ -204,8 +214,10 @@ export class Joplin
 	*/
 	post = async function(path: Path, query?: any, body?: any, files?: any[]) : Promise<any>
 	{
-		if (query != null)
+		if (body)
 		{
+			body.created_time = this.created;
+			body.updated_time = this.updated;
 		}
 		
 		var response = await joplin.data.post(path, query, body, files);
@@ -215,4 +227,6 @@ export class Joplin
 	parent: any;
 	decoder: any;
 	encoder: TextEncoder;
+	created: number = new Date().valueOf();
+	updated: number = new Date().valueOf();
 }
