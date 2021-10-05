@@ -187,8 +187,14 @@ export class Importer
                 if (item['type'] == 'hard_break')
                     md += '<br/>';
 			}
+			
+			const indent = para.attrs.indent || 0;
+			if (indent > 0)
+			{
+				return `<p style="padding-left: ${indent}em;">${md}</p>`;
+			}
             
-            return md
+            return md;
 		}
 		
 		/**

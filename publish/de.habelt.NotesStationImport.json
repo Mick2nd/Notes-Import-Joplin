@@ -7,6 +7,8 @@
 	"description": "This plugin imports notes from QNAP Notes Station",
 	"author": "Jürgen Habelt",
 	"homepage_url": "https://juergen.habelt-jena.de",
-	"repository_url": "https://github.com/Mick2nd/Notes-Import-Joplin",
-	"keywords": []
+	"repository_url": "",
+	"keywords": [],
+	"_publish_hash": "sha256:cada6f8c19c047cea979ccd315fca4457f3cbc58404448d5f082231ff5c2f6f8",
+	"_publish_commit": "master:dce21becf5eae1095583f132c3202b4f6125dc2f"
 }

@@ -1,6 +1,5 @@
 import joplin from 'api';
 import { MenuItemLocation, ImportContext, FileSystemItem } from 'api/types';
-import { QNAP } from './qnap';
 import { Importer } from './importer';
 import { Dialog } from './dialog';
 
@@ -29,6 +28,9 @@ const import_command = async () =>
 }
 
 
+/**
+	@abstract Function or lambda serving as click handler
+ */
 const on_click = async () : Promise<void> =>
 {
 	try
@@ -90,6 +92,7 @@ const import_module = async (ctx: ImportContext) : Promise<void> =>
  */
 async function setupPlugin()
 {
+	/*
 	const scriptId = 'pluginCommandImportQnap';
 	const onClickId = 'pluginCommandImportQnapOnClick';
 
@@ -110,14 +113,15 @@ async function setupPlugin()
 		'mnuImportQnapNotes', 
 		scriptId,
 		MenuItemLocation.Tools); 
+	*/
 		
 	await joplin.interop.registerImportModule(
 		{
 			format: 'nsex',
 			isNoteArchive: true,
-			description: 'Imports Qnap Notes Station Notebooks',
+			description: 'Qnap Notes Station Archive',
 			fileExtensions: [ 'ns3', ],
-			sources: [ FileSystemItem.File, FileSystemItem.Directory ],
+			sources: [ FileSystemItem.File ],
 			onExec: import_module,
 		}); 
 };

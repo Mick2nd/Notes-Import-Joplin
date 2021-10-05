@@ -1,24 +1,32 @@
-# Joplin Plugin
+# QNAP Notes Station Notes Importer - A Joplin Plugin
 
-This is a template to create a new Joplin plugin.
+This is an import module, e.g. a plugin serving the import of third party notes. In this case it
+imports notes from an archive created with *QNAP Notes Station* - an application on *QNAP NAS* 
+devices.
 
-The main two files you will want to look at are:
+## How to import
+An import involves the following steps:
+1. Select a notebook on the Joplin GUI where to import the notes
+1. Invoke the import command from the Joplin File - Import sub menu
+1. In the opening file dialog select the QNAP Notes Station archive
+1. The file will be imported along with its notebooks, sections, notes
 
-- `/src/index.ts`, which contains the entry point for the plugin source code.
-- `/src/manifest.json`, which is the plugin manifest. It contains information such as the plugin a name, version, etc.
+## Features of QNAP Notes Station which will be transformed
+ 1. Headings
+ 1. Paragraphs
+ 1. Tables
+ 1. Code sections
+ 1. Citations
+ 1. Attachments
+ 1. Images
+ 1. Ordered lists
+ 1. Bullet lists
+ 1. Task lists
+ 1. Nested lists
+ 1. (External) Links
+ 1. Horizontal rulers
+ 1. Subscripts
+ 1. Superscripts
+ 1. Tags assigned to notes
+  
 
-## Building the plugin
-
-The plugin is built using Webpack, which creates the compiled code in `/dist`. A JPL archive will also be created at the root, which can use to distribute the plugin.
-
-To build the plugin, simply run `npm run dist`.
-
-The project is setup to use TypeScript, although you can change the configuration to use plain JavaScript.
-
-## Updating the plugin framework
-
-To update the plugin framework, run `npm run update`.
-
-In general this command tries to do the right thing - in particular it's going to merge the changes in package.json and .gitignore instead of overwriting. It will also leave "/src" as well as README.md untouched.
-
-The file that may cause problem is "webpack.config.js" because it's going to be overwritten. For that reason, if you want to change it, consider creating a separate JavaScript file and include it in webpack.config.js. That way, when you update, you only have to restore the line that include your file.
