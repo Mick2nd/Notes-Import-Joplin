@@ -1,0 +1,43 @@
+
+	div#introduction {
+		font-family:'Lucida Console'; 
+		font-size:12px; 
+		padding: 10px; 
+		width: 95%; 
+		margin: auto; 
+		margin-bottom: 10px;
+		border-style: inset; 
+		line-height: 1.4;
+	}
+	
+	div#progress {
+		font-family:'Lucida Console'; 
+		font-size:12px; 
+		padding: 10px; 
+		width: 95%; 
+		height: 60vh; 
+		margin: auto; 
+		margin-bottom: 10px;
+		border-style: inset; 
+		line-height: 1.2;
+
+		overflow-y: scroll;
+		overscroll-behavior-y: contain;
+		scroll-snap-type: y proximity;
+	}
+
+	div#progress > div > div:last-child {
+		scroll-snap-align: end;
+	}
+	
+	div#button-container {
+		width: 95%; 
+		margin: auto; 
+	}
+	
+	button.button { 
+		width: 15%; 
+		margin: 10px;
+		display: block;
+		float: right;
+	}

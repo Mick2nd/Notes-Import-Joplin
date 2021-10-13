@@ -1,6 +1,7 @@
 import joplin from 'api';
-import { QNAP } from './qnap';
+import { QNAP } from './qnap2';
 import { Joplin } from './joplin';
+var he = require('he');
 
 
 /**
@@ -21,43 +22,43 @@ export class Importer
 	 */
 	public import_it = async function() : Promise<void>
 	{
-        const archive_structure = await this.qnap.get_structure();
+        const archive = await this.qnap.get_archive();
 		const folder = await joplin.workspace.selectedFolder();
-        
-        for (var book of archive_structure['notebooks'])                                             	// all note books
+
+        for await (let notebook of archive.items)                                             			// all note books
 		{
-            const nb_name = book['nb_name'];
-			this.joplin.set_time(book.create_time, book.update_time);									// prepare the time
+            const nb_name = notebook.name;
+			this.joplin.set_time(...notebook.time);														// prepare the time
 			const nb_data = await this.joplin.put_folder(folder.id, nb_name);                      		// put it as folder
             const nb_id = nb_data['id'];
             // this.logger.info(nb_name)
             // this.refresh()                                                                      		// refreshes the GUI
             
-            for (var section of book['sec_list'])                                                    	// all sections in note book
+            for await (let section of notebook.items)                                                   // all sections in note book
 			{
-                const sec_name = section['sec_name'];
-				this.joplin.set_time(section.create_time, section.update_time);							// prepare the time
+                const sec_name = section.name;
+				this.joplin.set_time(...section.time);													// prepare the time
                 const sec_data = await this.joplin.put_folder(nb_id, sec_name);                         // put it as folder
                 const sec_id = sec_data['id'];
                 // this.logger.info(f'- {sec_name}')
                 // this.refresh()                                                                  		// refreshes the GUI
             
-                for (var note of section['note_list'])                                               	// all notes in section
+                for await (let note of section.items)                                               	// all notes in section
 				{
-                    const location = note['note_location'];
-                    const note_file = await this.qnap.get_note(location);
-                    const note_name = note_file['note_name'];
-                    const note_content = note_file['content'];
+					const location = note.location;
+			        const note_content = await note.note_content;
+                    const note_name = note.name;
+					console.info(`Name was: ${note_name}`);
                     var md = await this.convert_note(location, note_content);                           // convert the content to mark down
-					this.joplin.set_time(note_file.create_time, note_file.update_time);					// prepare the time
+					this.joplin.set_time(...note.time);													// prepare the time
                     const resp = await this.joplin.put_note(sec_id, note_name, md);                     // put the note
                     // this.logger.info(f'-- {note_name}')
                     // this.refresh()                                                              		// refreshes the GUI
         
-                    for (var tag of note_file['tag_list'])
+                    for await (let tag of note.items)
 					{
-						this.joplin.set_time(tag.create_time, tag.create_time);							// prepare the time
-                        await this.joplin.put_tag(resp['id'], tag['tag_name'])
+						this.joplin.set_time(...tag.time);												// prepare the time
+                        await this.joplin.put_tag(resp['id'], tag.name);
                         // this.logger.info(f'--- tag: {tag["tag_name"]}')
                         // this.refresh()                                                              	// refreshes the GUI
 					}
@@ -80,20 +81,21 @@ export class Importer
         // 2/4/1    Anschaffungen ?
 		const folder = await joplin.workspace.selectedFolder();
         const location = '1/4/2';
-        const note_file = await this.qnap.get_note(location);
-        const note_name = note_file['note_name'];
-        const note_content = note_file['content'];
+        const note = await this.qnap.note;
+		await note.inject(location);
+        const note_name = note.name;
+        const note_content = await note.note_content;
         var md = await this.convert_note(location, note_content);
         const resp = await this.joplin.put_note(folder.id, note_name, md);
         
-        for (var tag of note_file['tag_list'])
-            await this.joplin.put_tag(resp['id'], tag['tag_name']);
+        for await (var tag of note.items)
+            await this.joplin.put_tag(resp['id'], tag.name);
         
         // this.logger.info('Probe successfully converted')
 	}
 
 	/**
-		@abstract Converts a QNAP Note in mark-down format
+		@abstract Converts a QNAP Note into mark-down format
         @param location: location of the note
         @param content: the content of a note (raw)
 	 */
@@ -210,7 +212,7 @@ export class Importer
 		const convert_heading = async function(heading: any) : Promise<string>
 		{
             const level = heading['attrs']['level'];
-            const txt = await convert_text(heading['content'][0]);
+            const txt = await convert_text(heading['content'][0], false);
             return '#'.repeat(level) + ' ' + txt;
 		}
 		
@@ -270,7 +272,7 @@ export class Importer
                 if (item == null)
                     continue;
                 if (item['type'] == 'text')
-                    md += await convert_text(item);
+                    md += await convert_text(item, false);
 			}
             
             return '```\n' + md + '```';
@@ -279,9 +281,11 @@ export class Importer
 		/**
 			@abstract Converts text
 		 */
-		const convert_text = async function(text: any) : Promise<string>
+		const convert_text = async function(text: any, repl = true) : Promise<string>
 		{
             var pure_text = text['text'];
+			if (repl)
+				pure_text = pure_text.replace(/</g, '&lt;').replace(/>/g, '&gt;');						// replace < / > by their entity references
             const marks = text.marks || [];
             var marks_string = '';
             for (var mark of marks)
@@ -321,12 +325,7 @@ export class Importer
             return `${sign}[${title}](:/${resp["id"]})`;                               		// finally return the md
 		}
 		
-		
-        content = content.replace(/\\"/g, '"');
-        content = content.replace(/~#~/g, '\\');                                          	// can stem from Qnap.get_note
-        var content_data = JSON.parse(content);                                             // this is then a dictionary
-        var md = convert_content(content_data['content']);
-    
+        var md = convert_content(content['content']);										// with QNAP.get_note_elem we get a ready to use JSON object
         return md;
 	}
 

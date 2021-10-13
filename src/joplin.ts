@@ -29,8 +29,8 @@ export class Joplin
 	 */
 	public set_time = function(created: string, updated: string) : void
 	{
-		this.created = (new Date(created)).valueOf();
-		this.updated = (new Date(updated)).valueOf();
+		this.created = (new Date(created + '+00')).valueOf();
+		this.updated = (new Date(updated + '+00')).valueOf();
 	}
 
 
@@ -201,10 +201,6 @@ export class Joplin
 	*/
 	get = async function(path: Path, query?: any) : Promise<any>
 	{
-		if (query != null)
-		{
-		}
-			
 		var response = await joplin.data.get(path, query);
 		return response;
 	}
@@ -214,13 +210,14 @@ export class Joplin
 	*/
 	post = async function(path: Path, query?: any, body?: any, files?: any[]) : Promise<any>
 	{
-		if (body)
+		if (path.length == 1 && body)
 		{
-			body.created_time = this.created;
-			body.updated_time = this.updated;
+			body['user_created_time'] = this.created;
+			body['user_updated_time'] = this.updated;
 		}
 		
 		var response = await joplin.data.post(path, query, body, files);
+
 		return response;
 	}
 	

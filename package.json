@@ -1,6 +1,6 @@
 {
   "name": "joplin-plugin-notes-station-import",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "scripts": {
     "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
     "prepare": "npm run dist",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.5.6",
+    "he": "^1.2.0",
     "node-stream-zip": "^1.15.0"
   }
 }

@@ -75,11 +75,11 @@ export class Dialog
 					${this.lines.join('\n')} 
 				</div>
 			</div>
-			<div id="button-container">
-				<button class="button" title='Cancel' onclick="toconsole()" >
+			<div id="button-container" onload="Load()">
+				<button class="button" title='Cancel' onclick="Cancel()" >
 					Cancel the import
 				</button>
-				<button class="button" title='Start' onclick="toconsole()" >
+				<button class="button" title='Start' onclick="Start()" >
 					Start the import
 				</button>
 			</div>`;
@@ -92,56 +92,7 @@ export class Dialog
 	 */
 	write_css = async function() : Promise<string>
 	{
-		const css = 
-		`
-			div#introduction {
-				font-family:'Lucida Console'; 
-				font-size:12px; 
-				padding: 10px; 
-				width: 95%; 
-				margin: auto; 
-				margin-bottom: 10px;
-				border-style: inset; 
-				line-height: 1.4;
-			}
-			
-			div#progress {
-				font-family:'Lucida Console'; 
-				font-size:12px; 
-				padding: 10px; 
-				width: 95%; 
-				height: 60vh; 
-				margin: auto; 
-				margin-bottom: 10px;
-				border-style: inset; 
-				line-height: 1.2;
-
-				overflow-y: scroll;
-				overscroll-behavior-y: contain;
-				scroll-snap-type: y proximity;
-			}
-
-			div#progress > div > div:last-child {
-				scroll-snap-align: end;
-			}
-			
-			div#button-container {
-				width: 95%; 
-				margin: auto; 
-			}
-			
-			button.button { 
-				width: 15%; 
-				margin: 10px;
-				display: inline-block;
-				float: right;
-			}
-		`;
-		const tmp_file = './tmpsheet.css';
-		const tmp_path = path.join(await joplin.plugins.installationDir(), tmp_file);
-		console.info(tmp_path);
-		await fs.writeFile(tmp_path, css);
-		
+		const tmp_file = './webview.css';
 		return tmp_file;
 	}
 	
@@ -150,23 +101,7 @@ export class Dialog
 	 */
 	write_script = async function() : Promise<string>
 	{
-		const script = 
-		`	
-			function toconsole()
-			{
-				const introduction = document.getElementById('introduction');
-				const buttonContainer = document.getElementById('button-container');
-				var progress = document.getElementById('progress');
-				progress.clientHeight = window.outerHeight - introduction.clientHeight - buttonContainer.clientHeight;
-			
-				console.info("Hello");
-			}
-		`;
-		const tmp_file = './tmpscript.js';
-		const tmp_path = path.join(await joplin.plugins.installationDir(), tmp_file);
-		console.info(tmp_path);
-		await fs.writeFile(tmp_path, script);
-		
+		const tmp_file = './webview.js';
 		return tmp_file;
 	}
 }

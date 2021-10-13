@@ -92,7 +92,6 @@ const import_module = async (ctx: ImportContext) : Promise<void> =>
  */
 async function setupPlugin()
 {
-	/*
 	const scriptId = 'pluginCommandImportQnap';
 	const onClickId = 'pluginCommandImportQnapOnClick';
 
@@ -113,6 +112,7 @@ async function setupPlugin()
 		'mnuImportQnapNotes', 
 		scriptId,
 		MenuItemLocation.Tools); 
+	/*
 	*/
 		
 	await joplin.interop.registerImportModule(
