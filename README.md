@@ -9,7 +9,7 @@ An import involves the following steps:
 1. Select a notebook on the Joplin GUI where to import the notes
 1. Invoke the import command from the Joplin File - Import sub menu
 1. In the opening file dialog select the QNAP Notes Station archive
-1. The file will be imported along with its notebooks, sections, notes
+1. The file will be imported along with its notebooks, sections, notes, tags
 
 ## Features of QNAP Notes Station which will be transformed
  1. Headings
@@ -28,5 +28,7 @@ An import involves the following steps:
  1. Subscripts
  1. Superscripts
  1. Tags assigned to notes
-  
+ 1. Created Time and Updated Time for notebooks, sections, notes, tags
+ 1. Alignment and indentation, implemented with HTML (no pure MD)
+ 1. Html entities for < and > characters in paragraphs
 

@@ -194,16 +194,36 @@ export class Importer
                     md += '<br/>';
 			}
 			
-			if (para.attrs)
-			{
-				const indent = para.attrs.indent || 0;
-				if (indent > 0)
-				{
-					return `<p style="padding-left: ${indent}em;">${md}</p>`;
-				}
-			}
+			const style = await get_style(para.attrs);								// determines paragraph style(s) for indentation and alignment
+			if (style !== '')
+				return `<p ${style}>${md}</p>`; 
             
             return md;
+		}
+		
+		/**
+			@abstract Determines paragraph style(s) for indentation and alignment
+		 */
+		const get_style = async function(attrs: any) : Promise<string>
+		{
+			if (!attrs)
+				return '';
+				
+			const indent = attrs.indent || 0;
+			const align = attrs.align || '';
+			
+			let indent_style = '';
+			if (indent > 0)
+				indent_style = `padding-left: ${indent}em;`;
+			
+			let align_style = '';
+			if (align !== '')
+				align_style = `text-align: ${align};`;
+				
+			if (indent_style !== '' || align === 'center' || align === 'right')
+				return `style="${align_style}${indent_style}"`;	
+			
+			return '';
 		}
 		
 		/**
