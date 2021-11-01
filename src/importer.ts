@@ -131,7 +131,7 @@ export class Importer
                 if (item['type'] == 'code_block')
                     item_md = await convert_code(item);
                     
-                md = md + '>'.repeat(quotation) + item_md + '\n';
+                md = md + '\n' + '>'.repeat(quotation) + item_md + '\n';
 			}
         
             return md
@@ -249,7 +249,7 @@ export class Importer
                 for (var para of item['content'])
                     txt += await convert_para(para);
                     
-                md += '\t'.repeat(level) + `- [${checked}] ` + txt + '\n';
+                md += ' '.repeat(level) + `- [${checked}] ` + txt + '\n';
 			}
                 
             return md;
@@ -263,18 +263,20 @@ export class Importer
             var md = '';
             for (var item of list['content'])
 			{
-                for (var nested of item['content'])                              // assumed to be 1 item inside list_item
+                for (var nested of item['content'])                              					// assumed to be 1 item inside list_item
 				{
                     if (nested['type'] == 'paragraph')
                         var txt = await convert_para(nested);
-                        md += '\t'.repeat(level) + pattern + txt + '\n';
-                        
-                    if (nested['type'] == 'bullet_list')
-                        md += await convert_list(nested, '- ', level + 1);
+                        md += ' '.repeat(level) + pattern + txt + '\n';
+                    
+    				const isOrdered = pattern === '1. ';
+
                     if (nested['type'] == 'ordered_list')
-                        md += await convert_list(nested, '1. ', level + 1);
+                        md += await convert_list(nested, '1. ', level + 3);
+                    if (nested['type'] == 'bullet_list')
+                        md += await convert_list(nested, '- ', level + (isOrdered ? 3 : 2));		// no trivial pattern for indentation of nested lists
                     if (nested['type'] == 'check_list')
-                        md += await convert_check_list(nested, level + 1);
+                        md += await convert_check_list(nested, level + (isOrdered ? 3 : 2));
 				}
 			}
                         
@@ -294,8 +296,11 @@ export class Importer
                 if (item['type'] == 'text')
                     md += await convert_text(item, false);
 			}
-            
-            return '```\n' + md + '```';
+			
+			if (md.endsWith('\n'))
+				return '```\n' + md + '```';
+
+			return '```\n' + md + '\n```';
 		}
 	
 		/**
@@ -306,26 +311,40 @@ export class Importer
             var pure_text = text['text'];
 			if (repl)
 				pure_text = pure_text.replace(/</g, '&lt;').replace(/>/g, '&gt;');						// replace < / > by their entity references
-            const marks = text.marks || [];
-            var marks_string = '';
-            for (var mark of marks)
-			{
-                if (mark['type'] == 'em')
-                    marks_string += '*';
-                if (mark['type'] == 'strong')
-                    marks_string += '**';
-                if (mark['type'] == 'superscript')
-                    marks_string += '^';
-                if (mark['type'] == 'subscript')
-                    marks_string += '~'
-                if (mark['type'] == 'link')
-				{
-                    const href = mark['attrs']['href'];
-                    pure_text = `[${pure_text}](${href})`;
-				}
-			}
+
+            const qnap_marks = text.marks || [];
+			
+			var href = 																					// a link takes precedence
+				qnap_marks
+				.filter((mark: any) => mark['type'] == 'link')
+				.map((mark: any) => mark['attrs']['href']);
+			
+			if (href.length > 0)
+				return `[${pure_text}](${href[0]})`;
             
-            return marks_string + pure_text + marks_string;
+			const joplin_marks = qnap_marks.map(convert_mark);											// else use the union of all other marks
+            return joplin_marks.join('') + pure_text + joplin_marks.reverse().join('');
+		}
+		
+		/**
+			@abstract Converts text marks like strong...
+		 */
+		const convert_mark = function(mark: string) : string
+		{
+            if (mark['type'] == 'em')
+                return '*';
+            if (mark['type'] == 'strong')
+                return '**';
+            if (mark['type'] == 'superscript')
+                return '^';
+            if (mark['type'] == 'subscript')
+                return '~'
+            if (mark['type'] == 'u')
+                return '++'
+            if (mark['type'] == 'del')
+                return '~~'
+
+			return '';
 		}
 		
 		/**

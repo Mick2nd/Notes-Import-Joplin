@@ -1,6 +1,12 @@
 
 	if (webviewApi)
 	{
+		window.onload="Load()";
+		
+		window.addEventListener(
+			'message', 
+			ev => { let msg = check(ev); if (msg !== null) console.info(`Message: ${JSON.stringify(msg)}`); });
+		
 		webviewApi.postMessage({ name: 'My Message', content: 'Content' });
 		console.info('Hey Hey - a webviewApi');
 	}
@@ -12,7 +18,7 @@
 		console.info(`In click handler: ${element} : ${tag}`);
 		if (tag == 'BUTTON')
 		{
-			webviewApi.postMessage({ name: 'My Message' });
+			webviewApi.postMessage({ name: 'My Message 2', content: 'Content 2' });
 			console.info(`In ${element.innerText}`);
 		}
 		
@@ -22,7 +28,26 @@
 		}
 		console.info(`${element}`);
 	});
-
+	
+	/**
+		Checks a message event 
+	 */
+	function check(ev)
+	{
+		if (ev.data.message &&
+			ev.data.message.from &&
+			ev.data.message.from === 'userWebview' &&
+			ev.data.message.to &&
+			ev.data.message.to === 'plugin')
+		{
+			// console.info('Valid message detected');
+			return ev.data.message.content;
+		}
+		
+		console.info(`No valid message detected: ${JSON.stringify(ev.data)}`);
+		return null;
+	}
+	
 	function Load(ev)
 	{
 		const target = ev ? ev.target : 'undefined';

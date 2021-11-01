@@ -14,7 +14,9 @@ const import_command = async () =>
 		const archive = "D:/Users/jsoft/Downloads/NotesStation_Export_20_9_2021.ns3";
 		var dlg = new Dialog(archive);
 		await dlg.create();
-		const res = await dlg.open();
+		let dlg_promise = dlg.open();
+		wait(1000).then(() => test());
+		const res = await dlg_promise;
 		console.info(res.id);
 	}
 	catch(e)
@@ -26,6 +28,19 @@ const import_command = async () =>
 		console.info('Finally'); 
 	} 
 }
+
+
+const wait = async (ts: number) : Promise<void> =>
+{
+	let promise = new Promise<any>((resolve) => setTimeout(resolve, ts));
+	return promise;
+}
+
+
+const test = () : void =>
+{
+	window.postMessage({ name: 'My Message from Plugin' }, 'UserWebview');	
+} 
 
 
 /**

@@ -75,7 +75,7 @@ export class Dialog
 					${this.lines.join('\n')} 
 				</div>
 			</div>
-			<div id="button-container" onload="Load()">
+			<div id="button-container" >
 				<button class="button" title='Cancel' onclick="Cancel()" >
 					Cancel the import
 				</button>
