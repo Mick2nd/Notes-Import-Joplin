@@ -5,13 +5,18 @@ imports notes from an archive created with *QNAP Notes Station* - an application
 devices.
 
 ## How to import
+
 An import involves the following steps:
-1. Select a notebook on the Joplin GUI where to import the notes
-1. Invoke the import command from the Joplin File - Import sub menu
-1. In the opening file dialog select the QNAP Notes Station archive
-1. The file will be imported along with its notebooks, sections, notes, tags
+
+1. The supported QNAP Notes Station archive is Notes Station 3 archive (ns3 extension)
+2. First export notes from Notes Station 3 to archive
+3. Select a notebook on the Joplin GUI where to import the notes
+4. Invoke the import command from the Joplin File - Import sub menu
+5. In the opening file dialog select the QNAP Notes Station archive
+6. The file will be imported along with its notebooks, sections, notes, tags
 
 ## Features of QNAP Notes Station which will be transformed
+
  1. Headings
  1. Paragraphs
  1. Tables
@@ -31,4 +36,3 @@ An import involves the following steps:
  1. Created Time and Updated Time for notebooks, sections, notes, tags
  1. Alignment and indentation, implemented with HTML (no pure MD)
  1. Html entities for < and > characters in paragraphs
-
